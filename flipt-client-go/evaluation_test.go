@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	evaluationClient *flipt.EvaluationClient
+	evaluationClient flipt.ClientInterface
 	fliptUrl         string
 	authToken        string
 )

@@ -21,19 +21,30 @@ import (
 
 const statusSuccess = "success"
 
-// EvaluationClient wraps the functionality of making variant and boolean evaluation of Flipt feature flags.
-type EvaluationClient struct {
-	engine         unsafe.Pointer
-	namespace      string
-	url            string
-	authentication any
-	ref            string
-	updateInterval int
-	fetchMode      FetchMode
-}
+type (
+	// ClientInterface describes methods of EvaluationClient
+	ClientInterface interface {
+		EvaluateVariant(ctx context.Context, flagKey, entityID string, evalContext map[string]string) (*VariantEvaluationResponse, error)
+		EvaluateBoolean(ctx context.Context, flagKey, entityID string, evalContext map[string]string) (*BooleanEvaluationResponse, error)
+		EvaluateBatch(ctx context.Context, requests []*EvaluationRequest) (*BatchEvaluationResponse, error)
+		ListFlags(ctx context.Context) ([]Flag, error)
+		Close() error
+	}
+
+	// EvaluationClient wraps the functionality of making variant and boolean evaluation of Flipt feature flags.
+	EvaluationClient struct {
+		engine         unsafe.Pointer
+		namespace      string
+		url            string
+		authentication any
+		ref            string
+		updateInterval int
+		fetchMode      FetchMode
+	}
+)
 
 // NewEvaluationClient constructs a Client.
-func NewEvaluationClient(opts ...clientOption) (*EvaluationClient, error) {
+func NewEvaluationClient(opts ...clientOption) (ClientInterface, error) {
 	client := &EvaluationClient{
 		namespace: "default",
 	}
